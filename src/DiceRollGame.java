@@ -2,10 +2,9 @@ public class DiceRollGame {
     public static void main(String[] args){
         System.out.println("<===== OOP Practice: Dice Roll Game =====>");
 
-        Dice dice = new Dice();
+        DiceGame dice = new DiceGame();
 
-        System.out.println(dice.targetNum());
-        System.out.println(dice.rollDice());
+        dice.startGame();
     }
 }
 
