@@ -22,89 +22,87 @@ public class DiceGame {
     private int playerOneScore;
     private int playerTwoScore;
 
-    public void startGame(){
+    public void startGame() {
         System.out.println("\n<=== GAME STARTED ===>");
+
         // FIELDS
         player = "player1";
-        String player1Input = "";
-        String player2Input = "";
 
         // get score target
         targetNum = dice.targetNum();
 
-
         // player turns
-        while(true){
-            if (player.equals("player1")){
-                System.out.println("Turn: Player 1");
-                System.out.println("🎯 " + targetNum + "     Player One: " + playerOneScore + "     Player Two: " + playerTwoScore);
-                System.out.print("What would you like to do, roll / stop: ");
-                player1Input = scanner.nextLine().toLowerCase().trim();
-
-                while(true){
-                    switch (player1Input){
-                        case "roll":
-                            // roll two dice
-                            diceOneResult = dice.rollDice();
-                            diceTwoResult = dice.rollDice();
-                            System.out.println("🎲 Dice One: " + diceOneResult);
-                            System.out.println("🎲 Dice Two: " + diceTwoResult);
-
-                            // get dice result sum
-                            int rollPoints = roleSum(diceOneResult, diceTwoResult);
-                            playerOneScore = playerOneScore + roleSum(diceOneResult, diceTwoResult);
-                            System.out.println("+" + rollPoints);
-
-                            break;
-                        case "stop":
-                            break;
-                        default:
-                            System.out.println("🔶Type roll or stop please...");
-                    }
-
-                    System.out.print("\n");
-                    break;
-                }
-            }else if(player.equals("player2")){
-                System.out.println("Turn: Player 2");
-                System.out.println("🎯 " + targetNum + "     player One: " + playerOneScore + "     player Two: " + playerTwoScore);
-                System.out.print("What would you like to do, roll / stop: ");
-                player2Input = scanner.nextLine().toLowerCase().trim();
-
-                while(true){
-                    switch (player2Input){
-                        case "roll":
-                            diceOneResult = dice.rollDice();
-                            diceTwoResult = dice.rollDice();
-                            System.out.println(diceOneResult);
-                            System.out.println(diceTwoResult);
-
-                            // get dice result sum
-                            int rollPoints = roleSum(diceOneResult, diceTwoResult);
-                            playerTwoScore = playerTwoScore + roleSum(diceOneResult, diceTwoResult);
-                            System.out.println("+" + rollPoints);
-
-                            break;
-                        case "stop":
-                            break;
-                        default:
-                            System.out.println("🔶Type roll or stop please...");
-                    }
-
-                    System.out.print("\n");
-                    break;
-                }
-
+        while (true) {
+            // player 1
+            if (player.equals("player1")) {
+                playerRollDice();
             }else{
-                System.out.println("🔴[ERROR] Player not selected...");
+                playerRollDice();
             }
 
-
+            // change player
             player = (player.equals("player1")) ? "player2" : "player1";
         }
     }
 
     // METHODS
+    // player roll dice and keeps score
+    public void playerRollDice(){
+        String playersTurn = (this.player.equals("player1")) ? "Player 1" : "player 2";
+
+        System.out.println("Turn: " + playersTurn);
+        System.out.println("🎯 " + targetNum + "     Player One: " + playerOneScore + "     Player Two: " + playerTwoScore);
+        System.out.print("What would you like to do, roll / stop: ");
+        String playerInput = scanner.nextLine().toLowerCase().trim();
+
+        while(true){
+            switch (playerInput){
+                case "roll":
+                    // dice rolls
+                    diceOneResult = dice.rollDice();
+                    diceTwoResult = dice.rollDice();
+
+                    // roll display
+                    rollResultDisplay();
+
+                    // get dice result sum
+                    int rollPoints = roleSum(diceOneResult, diceTwoResult);
+                    System.out.println("\n✨+" + rollPoints + " points");
+                    if(player.equals("player1")){
+                        playerOneScore += rollPoints;
+
+                    }else{
+                        playerTwoScore += rollPoints;
+                    }
+
+                    break;
+                case "stop":
+                    break;
+                default:
+                    System.out.println("🔶Type 'roll' or 'stop' please...");
+            }
+
+            System.out.print("\n");
+            break;
+        }
+    }
+
+    // dice role display
+    private void rollResultDisplay(){
+        for(int i = 0; i < diceOneResult; i++){
+            System.out.print("🎲");
+        }
+        System.out.print(" " + "(" + diceOneResult + ")\n");
+
+        //
+        for(int i = 0; i < diceTwoResult; i++){
+            System.out.print("🎲");
+        }
+        System.out.print(" " + "(" + diceTwoResult + ")");
+    }
+
+
+    // sum of two dice rolls
     private int roleSum(int diceOneResult, int diceTwoResult){
         return (diceOneResult + diceTwoResult);
     }
