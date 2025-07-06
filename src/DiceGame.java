@@ -8,7 +8,7 @@ public class DiceGame {
     // implement simple player turn logic 🟢
     // track rolls results  🟢
     // implement win/lose 🔴
-    // implement full player turn logic 🔴
+    // implement full player turn logic 🟢
 
     //Objects
     Scanner scanner = new Scanner(System.in);
@@ -21,19 +21,45 @@ public class DiceGame {
     private int diceTwoResult;
     private int playerOneScore;
     private int playerTwoScore;
+    private boolean isPlayerOneStopped;
+    private boolean isPlayerTwoStopped;
 
+    public DiceGame(){
+        this.player = "player1";
+        this.isPlayerOneStopped = false;
+        this.isPlayerTwoStopped = false;
+    }
+
+    // start game
     public void startGame() {
         System.out.println("\n<=== GAME STARTED ===>");
-
-        // FIELDS
-        player = "player1";
 
         // get score target
         targetNum = dice.targetNum();
 
         // player turns
         while (true) {
-            // player 1
+            // check if both players stoped
+            if(isPlayerOneStopped && isPlayerTwoStopped){
+                break;
+            }
+
+            // check if player went over target
+            if(playerOneScore > targetNum || playerTwoScore > targetNum){
+                break;
+            }
+
+            // check if players1 stoped
+            if(isPlayerOneStopped){
+                player = "player2";
+            }
+
+            // check if players2 stoped
+            if(isPlayerTwoStopped){
+                player = "player1";
+            }
+
+            // take turns ro roll dice
             if (player.equals("player1")) {
                 playerRollDice();
             }else{
@@ -43,6 +69,8 @@ public class DiceGame {
             // change player
             player = (player.equals("player1")) ? "player2" : "player1";
         }
+
+        System.out.println("Game has ended!");
     }
 
     // METHODS
@@ -74,9 +102,13 @@ public class DiceGame {
                     }else{
                         playerTwoScore += rollPoints;
                     }
-
                     break;
                 case "stop":
+                    if(player.equals("player1")){
+                        isPlayerOneStopped = true;
+                    }else{
+                        isPlayerTwoStopped = true;
+                    }
                     break;
                 default:
                     System.out.println("🔶Type 'roll' or 'stop' please...");
@@ -100,7 +132,6 @@ public class DiceGame {
         }
         System.out.print(" " + "(" + diceTwoResult + ")");
     }
-
 
     // sum of two dice rolls
     private int roleSum(int diceOneResult, int diceTwoResult){
