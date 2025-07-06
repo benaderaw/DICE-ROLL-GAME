@@ -24,11 +24,13 @@ public class DiceGame {
     private int playerTwoScore;
     private boolean isPlayerOneStopped;
     private boolean isPlayerTwoStopped;
+    private boolean gotMultiplier;
 
     public DiceGame(){
         this.player = "player1";
         this.isPlayerOneStopped = false;
         this.isPlayerTwoStopped = false;
+        this.gotMultiplier = false;
     }
 
     // start game
@@ -37,6 +39,7 @@ public class DiceGame {
 
         // get score target
         targetNum = dice.targetNum();
+        System.out.println("🎯Target: " + targetNum);
 
         // player turns
         while (true) {
@@ -91,7 +94,6 @@ public class DiceGame {
         String playersTurn = (this.player.equals("player1")) ? "Player 1" : "player 2";
 
         System.out.println("Turn: " + playersTurn);
-        System.out.println("🎯 " + targetNum + "     Player One: " + playerOneScore + "     Player Two: " + playerTwoScore);
         String playerInput;
 
         while(true){
@@ -104,16 +106,32 @@ public class DiceGame {
                     diceOneResult = dice.rollDice();
                     diceTwoResult = dice.rollDice();
 
+                    //
+                    if(diceOneResult == diceTwoResult){
+                        gotMultiplier = true;
+                    }
+
                     // roll display
                     rollResultDisplay();
 
                     // get dice result sum
                     int rollPoints = roleSum(diceOneResult, diceTwoResult);
-                    System.out.println("\n✨+" + rollPoints + " points");
-                    if(player.equals("player1")){
-                        playerOneScore += rollPoints;
-
+                    String stars = gotMultiplier ? "🌟" : "✨";
+                    if(gotMultiplier){
+                        System.out.println("\n" + stars + "+" + rollPoints + " points " + stars);
                     }else{
+                        System.out.println("\n" + stars + "+" + rollPoints + " points");
+                    }
+
+                    if(player.equals("player1")){
+                        if(diceOneResult == diceTwoResult){
+                            rollPoints *= 2;
+                        }
+                        playerOneScore += rollPoints;
+                    }else{
+                        if(diceOneResult == diceTwoResult){
+                            rollPoints *= 2;
+                        }
                         playerTwoScore += rollPoints;
                     }
                     break;
@@ -128,8 +146,9 @@ public class DiceGame {
                     System.out.println("🔶Type 'roll' or 'stop' please...\n");
                     continue;
             }
-
+            System.out.println("🎯 " + targetNum + "     Player One: " + playerOneScore + "     Player Two: " + playerTwoScore);
             System.out.print("\n");
+            gotMultiplier = false;
             break;
         }
 
@@ -153,5 +172,6 @@ public class DiceGame {
     private int roleSum(int diceOneResult, int diceTwoResult){
         return (diceOneResult + diceTwoResult);
     }
+
 
 }
