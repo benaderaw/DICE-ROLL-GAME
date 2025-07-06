@@ -9,95 +9,102 @@ public class DiceGame {
     // track rolls results  🟢
     // implement win/lose 🟢
     // implement full player turn logic 🟢
-    // double points 🔴
+    // double points 🟢
 
-    //Objects
+    // OBJECTS
     Scanner scanner = new Scanner(System.in);
     Dice dice = new Dice();
 
     // FIELDS
-    private String player;
+    private Player player1 = new Player("Player 1");
+    private Player player2 = new Player("Player 2");
+    private Player currentPlayer;
     private int targetNum;
     private int diceOneResult;
     private int diceTwoResult;
-    private int playerOneScore;
-    private int playerTwoScore;
-    private boolean isPlayerOneStopped;
-    private boolean isPlayerTwoStopped;
     private boolean gotMultiplier;
-
-    public DiceGame(){
-        this.player = "player1";
-        this.isPlayerOneStopped = false;
-        this.isPlayerTwoStopped = false;
-        this.gotMultiplier = false;
-    }
 
     // start game
     public void startGame() {
         System.out.println("\n<=== GAME STARTED ===>");
 
-        // get score target
+        // get players name
+        getPlayerNames();
+
+        // get getScore() target
         targetNum = dice.targetNum();
-        System.out.println("🎯Target: " + targetNum);
+
+        currentPlayer = player1;
 
         // player turns
         while (true) {
             // check if both players stoped
-            if(isPlayerOneStopped && isPlayerTwoStopped){
-                if(playerOneScore > playerTwoScore){
-                    System.out.println("Player 1 has won!");
-                    System.out.println("With " + playerOneScore + " points, Player 1 was the closes to the target number of " + targetNum + ".");
-                }else{
-                    System.out.println("Player 2 has won!");
-                    System.out.println("With " + playerTwoScore + " points, Player 2 was the closes to the target number of " + targetNum + ".");                }
-                break;
-            }
-
-            // check ig players went over target
-            if(playerOneScore > targetNum || playerTwoScore > targetNum){
-                if(playerOneScore > targetNum){
-                    System.out.println("Player 1 has went over the target number of " + targetNum + ". Player 2 has won!");
-                }else{
-                    System.out.println("Player 2 has went over the target number of " + targetNum + ". Player 1 has won!");
-                }
+            if(player1.getHasStopped() && player2.getHasStopped()) {
+                Player winner = player1.getScore() > player2.getScore() ? player1 : player2;
+                System.out.println("🎉🎉🎉 " + winner.getName() + " has WON! 🎉🎉🎉");
                 break;
             }
 
             // check if players1 stoped
-            if(isPlayerOneStopped){
-                player = "player2";
+            if(currentPlayer.getHasStopped()){
+                currentPlayer = switchPlayers();
+                continue;
             }
 
-            // check if players2 stoped
-            if(isPlayerTwoStopped){
-                player = "player1";
+            // current player rolls dice
+            playerRollDice();
+
+            // check if player reached the target number exactly
+            if (currentPlayer.getScore() == targetNum) {
+                System.out.println("WOW! " + currentPlayer.getName() + " has reached the target number EXACTLY!");
+                System.out.println("🎉🎉🎉🎉🎉 " + currentPlayer.getName() + " has WON! 🎉🎉🎉🎉🎉");
+                break;
             }
 
-            // take turns ro roll dice
-            if (player.equals("player1")) {
-                playerRollDice();
-            }else{
-                playerRollDice();
+            // check if current players went over target
+            if(currentPlayer.getScore() > targetNum){
+                Player otherPlayer = currentPlayer == player1 ? player2 : player1;
+                System.out.println("You went over the target number of " + targetNum + ".");
+                System.out.println("🎉🎉🎉 " + otherPlayer.getName() + " has WON! 🎉🎉🎉");
+                break;
             }
 
             // change player
-            player = (player.equals("player1")) ? "player2" : "player1";
+            currentPlayer = switchPlayers();
         }
 
         System.out.println("Game has ended!");
     }
 
-    // METHODS
-    // player roll dice and keeps score
-    public void playerRollDice(){
-        String playersTurn = (this.player.equals("player1")) ? "Player 1" : "player 2";
-
-        System.out.println("Turn: " + playersTurn);
-        String playerInput;
+    // get players name
+    private void getPlayerNames(){
+        System.out.print("Player 1 name: ");
+        player1.setName(scanner.nextLine());
 
         while(true){
-            System.out.print("What would you like to do, roll / stop: ");
+            System.out.print("Player 2 name: ");
+            player2.setName(scanner.nextLine());
+            if(player2.getName().equalsIgnoreCase(player1.getName())){
+                System.out.println("Names can not be identical");
+                continue;
+            }
+            break;
+        }
+        System.out.print("\n");
+    }
+
+    // player roll dice and keeps getScore()
+    private void playerRollDice(){
+        System.out.println("🎯Target: " + targetNum + "      " + "👤Player: " + currentPlayer.getName().toUpperCase());
+        String playerInput;
+
+        OuterLoop:
+        while(true){
+            if(currentPlayer.getScore() == 0){
+                System.out.print("Type 'roll' to start your turn: ");
+            }else{
+                System.out.print("What would you like to do, roll / stop: ");
+            }
             playerInput = scanner.nextLine().toLowerCase().trim();
 
             switch (playerInput){
@@ -106,72 +113,81 @@ public class DiceGame {
                     diceOneResult = dice.rollDice();
                     diceTwoResult = dice.rollDice();
 
-                    //
+                    // see if both dice land on the same side
                     if(diceOneResult == diceTwoResult){
                         gotMultiplier = true;
                     }
 
-                    // roll display
-                    rollResultDisplay();
+                    // get points/sides sum
+                    int rollPoints = roleSum(diceOneResult, diceTwoResult, gotMultiplier);
 
-                    // get dice result sum
-                    int rollPoints = roleSum(diceOneResult, diceTwoResult);
-                    String stars = gotMultiplier ? "🌟" : "✨";
-                    if(gotMultiplier){
-                        System.out.println("\n" + stars + "+" + rollPoints + " points " + stars);
-                    }else{
-                        System.out.println("\n" + stars + "+" + rollPoints + " points");
-                    }
+                    // rolled dice and getScore()/points display
+                    diceDisplay();
+                    scoreDisplay(rollPoints);
 
-                    if(player.equals("player1")){
-                        if(diceOneResult == diceTwoResult){
-                            rollPoints *= 2;
-                        }
-                        playerOneScore += rollPoints;
-                    }else{
-                        if(diceOneResult == diceTwoResult){
-                            rollPoints *= 2;
-                        }
-                        playerTwoScore += rollPoints;
-                    }
+                    // player total getScore()
+                    currentPlayer.playerScore(rollPoints);
                     break;
                 case "stop":
-                    if(player.equals("player1")){
-                        isPlayerOneStopped = true;
-                    }else{
-                        isPlayerTwoStopped = true;
+                    if(currentPlayer.getScore() == 0){
+                        System.out.println("🔶You have to roll on your first turn...\n");
+                        continue;
                     }
+                    currentPlayer.setHasStopped(true);
                     break;
                 default:
+                    if(currentPlayer.getScore() == 0){
+                        System.out.println("🔶Type 'roll' please...\n");
+                        continue;
+                    }
                     System.out.println("🔶Type 'roll' or 'stop' please...\n");
                     continue;
             }
-            System.out.println("🎯 " + targetNum + "     Player One: " + playerOneScore + "     Player Two: " + playerTwoScore);
-            System.out.print("\n");
+            System.out.println("🎯 " + targetNum + "     " + player1.getName() + ": " + player1.getScore() + "     " + player2.getName() + ": " + player2.getScore());
+            System.out.print("\n\n");
             gotMultiplier = false;
             break;
         }
-
     }
 
-    // dice role display
-    private void rollResultDisplay(){
+    // switch player
+    private Player switchPlayers(){
+        return currentPlayer == player1 ? player2 : player1;
+    }
+
+    // dice role console display
+    private void diceDisplay(){
+        // first dice
         for(int i = 0; i < diceOneResult; i++){
             System.out.print("🎲");
         }
         System.out.print(" " + "(" + diceOneResult + ")\n");
 
-        //
+        // second dice
         for(int i = 0; i < diceTwoResult; i++){
             System.out.print("🎲");
         }
         System.out.print(" " + "(" + diceTwoResult + ")");
+
+    }
+
+    // getScore() console display
+    private void scoreDisplay(int rollPoints){
+        String stars = gotMultiplier ? "🌟" : "✨";
+        if(gotMultiplier){
+            System.out.println("\n" + stars + "+" + rollPoints + " points " + stars);
+        }else{
+            System.out.println("\n" + stars + "+" + rollPoints + " points");
+        }
     }
 
     // sum of two dice rolls
-    private int roleSum(int diceOneResult, int diceTwoResult){
+    private int roleSum(int diceOneResult, int diceTwoResult, boolean gotMultiplier){
+        if(gotMultiplier){
+            return  (diceOneResult + diceTwoResult) * 2;
+        }
+
         return (diceOneResult + diceTwoResult);
     }
-
 
 }
