@@ -7,8 +7,9 @@ public class DiceGame {
     // player input 🟢
     // implement simple player turn logic 🟢
     // track rolls results  🟢
-    // implement win/lose 🔴
+    // implement win/lose 🟢
     // implement full player turn logic 🟢
+    // double points 🔴
 
     //Objects
     Scanner scanner = new Scanner(System.in);
@@ -41,11 +42,22 @@ public class DiceGame {
         while (true) {
             // check if both players stoped
             if(isPlayerOneStopped && isPlayerTwoStopped){
+                if(playerOneScore > playerTwoScore){
+                    System.out.println("Player 1 has won!");
+                    System.out.println("With " + playerOneScore + " points, Player 1 was the closes to the target number of " + targetNum + ".");
+                }else{
+                    System.out.println("Player 2 has won!");
+                    System.out.println("With " + playerTwoScore + " points, Player 2 was the closes to the target number of " + targetNum + ".");                }
                 break;
             }
 
-            // check if player went over target
+            // check ig players went over target
             if(playerOneScore > targetNum || playerTwoScore > targetNum){
+                if(playerOneScore > targetNum){
+                    System.out.println("Player 1 has went over the target number of " + targetNum + ". Player 2 has won!");
+                }else{
+                    System.out.println("Player 2 has went over the target number of " + targetNum + ". Player 1 has won!");
+                }
                 break;
             }
 
@@ -80,10 +92,12 @@ public class DiceGame {
 
         System.out.println("Turn: " + playersTurn);
         System.out.println("🎯 " + targetNum + "     Player One: " + playerOneScore + "     Player Two: " + playerTwoScore);
-        System.out.print("What would you like to do, roll / stop: ");
-        String playerInput = scanner.nextLine().toLowerCase().trim();
+        String playerInput;
 
         while(true){
+            System.out.print("What would you like to do, roll / stop: ");
+            playerInput = scanner.nextLine().toLowerCase().trim();
+
             switch (playerInput){
                 case "roll":
                     // dice rolls
@@ -111,12 +125,14 @@ public class DiceGame {
                     }
                     break;
                 default:
-                    System.out.println("🔶Type 'roll' or 'stop' please...");
+                    System.out.println("🔶Type 'roll' or 'stop' please...\n");
+                    continue;
             }
 
             System.out.print("\n");
             break;
         }
+
     }
 
     // dice role display
