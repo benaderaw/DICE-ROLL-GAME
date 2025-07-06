@@ -3,16 +3,12 @@ import java.util.Scanner;
 public class Player {
     private String name;
     private int score;
-    private boolean hasStoped;
+    private boolean hasStopped;
 
     public Player(String name){
         this.name = name;
         this.score = 0;
-        this.hasStoped = false;
-    }
-
-    public void playerNames(String name){
-        this.name = name;
+        this.hasStopped = false;
     }
 
     public void playerScore(int points){
@@ -21,7 +17,7 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{name='" + name + "', score=" + score + "has stopped='" + hasStoped + "}";
+        return "Player{name='" + name + "', score=" + score + "has stopped='" + hasStopped + "}";
     }
 
     // GETTERS
@@ -34,7 +30,7 @@ public class Player {
     }
 
     public boolean getHasStopped(){
-        return hasStoped;
+        return hasStopped;
     }
 
     // SETTER
@@ -43,6 +39,6 @@ public class Player {
     }
 
     public void setHasStopped(boolean hasStopped){
-        this.hasStoped = hasStopped;
+        this.hasStopped = hasStopped;
     }
 }

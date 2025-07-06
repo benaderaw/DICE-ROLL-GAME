@@ -40,6 +40,10 @@ public class DiceGame {
         while (true) {
             // check if both players stoped
             if(player1.getHasStopped() && player2.getHasStopped()) {
+                if(player1.getScore() == player2.getScore()){
+                    System.out.println("🟡It's a tie! Try again...");
+                    break;
+                }
                 Player winner = player1.getScore() > player2.getScore() ? player1 : player2;
                 System.out.println("🎉🎉🎉 " + winner.getName() + " has WON! 🎉🎉🎉");
                 break;
@@ -95,10 +99,10 @@ public class DiceGame {
 
     // player roll dice and keeps getScore()
     private void playerRollDice(){
+        gotMultiplier = false;
         System.out.println("🎯Target: " + targetNum + "      " + "👤Player: " + currentPlayer.getName().toUpperCase());
         String playerInput;
 
-        OuterLoop:
         while(true){
             if(currentPlayer.getScore() == 0){
                 System.out.print("Type 'roll' to start your turn: ");
@@ -121,12 +125,13 @@ public class DiceGame {
                     // get points/sides sum
                     int rollPoints = roleSum(diceOneResult, diceTwoResult, gotMultiplier);
 
+                    // player total getScore()
+                    currentPlayer.playerScore(rollPoints);
+
                     // rolled dice and getScore()/points display
                     diceDisplay();
                     scoreDisplay(rollPoints);
 
-                    // player total getScore()
-                    currentPlayer.playerScore(rollPoints);
                     break;
                 case "stop":
                     if(currentPlayer.getScore() == 0){
@@ -145,7 +150,6 @@ public class DiceGame {
             }
             System.out.println("🎯 " + targetNum + "     " + player1.getName() + ": " + player1.getScore() + "     " + player2.getName() + ": " + player2.getScore());
             System.out.print("\n\n");
-            gotMultiplier = false;
             break;
         }
     }
@@ -174,8 +178,13 @@ public class DiceGame {
     // getScore() console display
     private void scoreDisplay(int rollPoints){
         String stars = gotMultiplier ? "🌟" : "✨";
-        if(gotMultiplier){
-            System.out.println("\n" + stars + "+" + rollPoints + " points " + stars);
+        String bonusPointStars = "🌟🌟🌟";
+
+        if(currentPlayer.getScore() == targetNum){
+            currentPlayer.playerScore(100);
+            System.out.println("\n" + bonusPointStars + "+" + rollPoints + " points + 100 BONUS points!" + bonusPointStars);
+        }else if(gotMultiplier){
+            System.out.println("\n" + stars + "2X POINTS! / +" + rollPoints + " points " + stars);
         }else{
             System.out.println("\n" + stars + "+" + rollPoints + " points");
         }

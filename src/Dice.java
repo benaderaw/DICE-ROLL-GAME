@@ -7,7 +7,7 @@ public class Dice {
     // METHODS
     // target number
     public int targetNum(){
-        return random.nextInt(20, 30);
+        return random.nextInt(30, 50);
     }
 
     // roll dice
